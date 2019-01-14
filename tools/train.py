@@ -1,3 +1,10 @@
+# --------------------------------------------------------
+# DenseFusion 6D Object Pose Estimation by Iterative Dense Fusion
+# Licensed under The MIT License [see LICENSE for details]
+# Written by Chen
+# --------------------------------------------------------
+
+import _init_paths
 import argparse
 import os
 import random
@@ -49,15 +56,13 @@ def main():
         opt.num_objects = 21 #number of object classes in the dataset
         opt.num_points = 1000 #number of points on the input pointcloud
         opt.outf = 'trained_models/ycb' #folder to save trained models
-        opt.log_dir = 'logs/ycb' #folder to save logs
-        opt.dataset_root = '/home/data1/jeremy/YCB_Video_Dataset' #dataset root dir
+        opt.log_dir = 'experiments/logs/ycb' #folder to save logs
         opt.repeat_epoch = 1 #number of repeat times for one epoch training
     elif opt.dataset == 'linemod':
         opt.num_objects = 13
         opt.num_points = 500
         opt.outf = 'trained_models/linemod'
-        opt.log_dir = 'logs/linemod'
-        opt.dataset_root = '/home/data1/jeremy/Linemod_preprocessed'
+        opt.log_dir = 'experiments/logs/linemod'
         opt.repeat_epoch = 20
     else:
         print('Unknown dataset')

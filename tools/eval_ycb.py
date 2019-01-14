@@ -1,3 +1,4 @@
+import _init_paths
 import argparse
 import os
 import copy
@@ -24,9 +25,9 @@ from lib.network import PoseNet, PoseRefineNet
 from lib.transformations import euler_matrix, quaternion_matrix, quaternion_from_matrix
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset_root', type=str, default = '/home/data1/jeremy/YCB_Video_Dataset', help='dataset root dir')
-parser.add_argument('--model', type=str, default = 'pose_model_23_0.012863246640872631.pth',  help='resume PoseNet model')
-parser.add_argument('--refine_model', type=str, default = 'pose_refine_model_49_0.009449292959118935.pth',  help='resume PoseRefineNet model')
+parser.add_argument('--dataset_root', type=str, default = '', help='dataset root dir')
+parser.add_argument('--model', type=str, default = '',  help='resume PoseNet model')
+parser.add_argument('--refine_model', type=str, default = '',  help='resume PoseRefineNet model')
 opt = parser.parse_args()
 
 norm = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -47,8 +48,8 @@ iteration = 2
 bs = 1
 dataset_config_dir = 'datasets/ycb/dataset_config'
 ycb_toolbox_dir = 'YCB_Video_toolbox'
-result_wo_refine_dir = 'eval_result/ycb/Densefusion_wo_refine_result'
-result_refine_dir = 'eval_result/ycb/Densefusion_iterative_result'
+result_wo_refine_dir = 'experiments/eval_result/ycb/Densefusion_wo_refine_result'
+result_refine_dir = 'experiments/eval_result/ycb/Densefusion_iterative_result'
 trained_models_dir = 'trained_models/ycb'
 
 def get_bbox(posecnn_rois):
@@ -235,7 +236,7 @@ for now in range(0, 2949):
                 my_t = my_t_final
 
             my_result.append(my_pred.tolist())
-        except:
+        except ZeroDivisionError:
             print("PoseCNN Detector Lost {0} at No.{1} keyframe".format(itemid, now))
             my_result_wo_refine.append([0.0 for i in range(7)])
             my_result.append([0.0 for i in range(7)])

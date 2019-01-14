@@ -36,14 +36,6 @@ This repository is the implementation code of the paper "DenseFusion: 6D Object 
 * CUDA 7.5/8.0/9.0 (Required. CPU-only will lead to extreme slow training speed because of the loss calculation of the symmetry objects (pixel-wise nearest neighbour loss).)
 
 ## Code Structure
-* **lib**
-	* **lib/loss.py**: Loss calculation for DenseFusion model.
-	* **lib/loss_refiner.py**: Loss calculation for iterative refinement model.
-	* **lib/transformations.py**: [Transformation Function Library](https://www.lfd.uci.edu/~gohlke/code/transformations.py.html).
-    * **lib/network.py**: Network architecture.
-    * **lib/extractors.py**: Encoder network architecture.
-    * **lib/pspnet.py**: Decoder network architecture.
-    * **lib/utils.py**: Logger code.
 * **datasets**
 	* **datasets/ycb**
 		* **datasets/ycb/dataset.py**: Data loader for YCB_Video dataset.
@@ -55,33 +47,50 @@ This repository is the implementation code of the paper "DenseFusion: 6D Object 
 		* **datasets/linemod/dataset.py**: Data loader for LineMOD dataset.
 		* **datasets/linemod/dataset_config**: 
 			* **datasets/linemod/dataset_config/models_info.yml**: Object model info of LineMOD dataset.
-* **knn**: CUDA K-nearest neighbours library adapted from [pytorch_knn_cuda](https://github.com/chrischoy/pytorch_knn_cuda).
+* **replace_ycb_toolbox**: Replacement codes for the evaluation with [YCB_Video_toolbox](https://github.com/yuxng/YCB_Video_toolbox).
 * **trained_models**
 	* **trained_models/ycb**: Checkpoints of YCB_Video dataset.
 	* **trained_models/linemod**: Checkpoints of LineMOD dataset.
-* **eval_result**
-	* **eval_result/ycb**
-		* **eval_result/ycb/Densefusion_wo_refine_result**: Evaluation result on YCB_Video dataset without refinement.
-		* **eval_result/ycb/Densefusion_iterative_result**: Evaluation result on YCB_Video dataset with iterative refinement.
-	* **eval_result/linemod**: Evaluation results on LineMOD dataset with iterative refinement.
-* **replace_ycb_toolbox**: Replacement codes for the evaluation with [YCB_Video_toolbox](https://github.com/yuxng/YCB_Video_toolbox).
-* **eval_ycb.py**: Evaluation script for YCB_Video dataset.
-* **eval_linemod.py**: Evaluation script for LineMOD dataset.
-* **train.py**: Training script for YCB_Video dataset and LineMOD dataset.
+* **lib**
+	* **lib/loss.py**: Loss calculation for DenseFusion model.
+	* **lib/loss_refiner.py**: Loss calculation for iterative refinement model.
+	* **lib/transformations.py**: [Transformation Function Library](https://www.lfd.uci.edu/~gohlke/code/transformations.py.html).
+    * **lib/network.py**: Network architecture.
+    * **lib/extractors.py**: Encoder network architecture adapted from [pspnet-pytorch](https://github.com/Lextal/pspnet-pytorch)
+    * **lib/pspnet.py**: Decoder network architecture.
+    * **lib/utils.py**: Logger code.
+    * **lib/knn/**: CUDA K-nearest neighbours library adapted from [pytorch_knn_cuda](https://github.com/chrischoy/pytorch_knn_cuda).
+* **tools**
+	* **tools/_init_paths.py**: Add local path.
+	* **tools/eval_ycb.py**: Evaluation code for YCB_Video dataset.
+	* **tools/eval_linemod.py**: Evaluation code for LineMOD dataset.
+	* **tools/train.py**: Training code for YCB_Video dataset and LineMOD dataset.
+* **experiments**
+	* **experiments/eval_result**
+		* **experiments/eval_result/ycb**
+			* **experiments/eval_result/ycb/Densefusion_wo_refine_result**: Evaluation result on YCB_Video dataset without refinement.
+			* **experiments/eval_result/ycb/Densefusion_iterative_result**: Evaluation result on YCB_Video dataset with iterative refinement.
+		* **experiments/eval_result/linemod**: Evaluation results on LineMOD dataset with iterative refinement.
+	* **experiments/logs/**: Training log files.
+	* **experiments/scripts**
+		* **experiments/scripts/train_ycb.sh**: Training script on the YCB_Video dataset.
+		* **experiments/scripts/train_linemod.sh**: Training script on the LineMOD dataset.
+		* **experiments/scripts/eval_ycb.sh**: Evaluation script on the YCB_Video dataset.
+		* **experiments/scripts/eval_linemod.sh**: Evaluation script on the LineMOD dataset.
+* **download.sh**: Script for downloading YCB_Video Dataset, preprocessed LineMOD dataset and the trained checkpoints.
+
 
 ## Datasets
 
 This work is tested on two 6D object pose estimation datasets:
 
-* [YCB_Video Dataset](https://rse-lab.cs.washington.edu/projects/posecnn/): Download from google drive:
-```
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1if4VoEXNx9W3XCn0Y7Fp15B4GpcYbyYi' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1if4VoEXNx9W3XCn0Y7Fp15B4GpcYbyYi" -O YCB_Video_Dataset.zip && rm -rf /tmp/cookies.txt
-```
-Training and Testing sets follow [PoseCNN](https://arxiv.org/abs/1711.00199). The training set includes 80 training videos 0000-0047 & 0060-0091 (choosen by 7 frame as a gap in our training) and synthetic data 000000-079999. The testing set includes 2949 keyframes from 10 testing videos 0048-0059.
+* [YCB_Video Dataset](https://rse-lab.cs.washington.edu/projects/posecnn/): Training and Testing sets follow [PoseCNN](https://arxiv.org/abs/1711.00199). The training set includes 80 training videos 0000-0047 & 0060-0091 (choosen by 7 frame as a gap in our training) and synthetic data 000000-079999. The testing set includes 2949 keyframes from 10 testing videos 0048-0059.
 
-* [LineMOD](http://campar.in.tum.de/Main/StefanHinterstoisser): Download the [preprocessed LineMOD dataset](https://drive.google.com/drive/folders/19ivHpaKm9dOrr12fzC8IDFczWRPFxho7) (including the testing results outputted by the trained vanilla SegNet used for evaluation):
-```
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1YFUra533pxS_IHsb9tB87lLoxbcHYXt8' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1YFUra533pxS_IHsb9tB87lLoxbcHYXt8" -O Linemod_preprocessed.zip && rm -rf /tmp/cookies.txt
+* [LineMOD](http://campar.in.tum.de/Main/StefanHinterstoisser): Download the [preprocessed LineMOD dataset](https://drive.google.com/drive/folders/19ivHpaKm9dOrr12fzC8IDFczWRPFxho7) (including the testing results outputted by the trained vanilla SegNet used for evaluation).
+
+Download YCB_Video Dataset, preprocessed LineMOD dataset and the trained checkpoints:
+```	
+./download.sh
 ```
 
 ## Training
@@ -89,12 +98,12 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 * YCB_Video Dataset:
 	After you have downloaded and unzipped the YCB_Video_Dataset.zip and installed all the dependency packages, please run:
 ```	
-python train.py --dataset=ycb --dataset_root=PATH_TO_YCB_DATASET/
+./experiments/scripts/train_ycb.sh
 ```
 * LineMOD Dataset:
 	After you have downloaded and unzipped the Linemod_preprocessed.zip, please run:
 ```	
-python train.py --dataset=linemod --dataset_root=PATH_TO_LINEMOD_DATASET/
+./experiments/scripts/train_linemod.sh
 ```
 **Training Process**: The training process contains two components: (i) Training of the DenseFusion model. (ii) Training of the Iterative Refinement model. In this code, a DenseFusion model will be trained first. When the average testing distance result (ADD for non-symmetry objects, ADD-S for symmetry objects) is smaller than a certain margin, the training of the Iterative Refinement model will start automatically and the DenseFusion model will then be fixed. You can change this margin to have better DenseFusion result without refinement but it's inferior than the final result after the iterative refinement. 
 
@@ -107,7 +116,7 @@ python train.py --dataset=linemod --dataset_root=PATH_TO_LINEMOD_DATASET/
 	Just run:
 ```
 cd vanilla_segmentation/
-python train.py --dataset_root=PATH_TO_YCB_DATASET/
+python train.py --dataset_root=./datasets/ycb/YCB_Video_Dataset
 ```
 To make the best use of the training set, several data augementation techniques are used in this code:
 
@@ -120,29 +129,22 @@ To make the best use of the training set, several data augementation techniques 
 ## Evaluation
 
 ### Evaluation on YCB_Video Dataset
-For fair comparsion, we use the same segmentation results of [PoseCNN](https://rse-lab.cs.washington.edu/projects/posecnn/) and compare with their results after ICP refinement. Please first download the `YCB_Video_toolbox` to the root folder of this repo:
+For fair comparsion, we use the same segmentation results of [PoseCNN](https://rse-lab.cs.washington.edu/projects/posecnn/) and compare with their results after ICP refinement.
+Please run:
 ```
-cd Densefusion
-git clone https://github.com/yuxng/YCB_Video_toolbox.git
-cd YCB_Video_toolbox
-unzip results_PoseCNN_RSS2018.zip
-cd ..
+./experiments/scripts/eval_ycb.sh
 ```
-Then please run:
-```
-python eval_ycb.py --dataset_root=PATH_TO_YCB_DATASET/ --model=NAME_OF_MODEL -- refine_model=NAME_OF_REFINE_MODEL
-```
-This script will test the selected DenseFusion and Iterative Refinement models on the 2949 keyframes of the 10 testing video in YCB_Video Dataset with the same segmentation result of PoseCNN. The result without refinement is stored in `eval_result/ycb/Densefusion_wo_refine_result` and the refined result is in `eval_result/ycb/Densefusion_iterative_result`.
+This script will first download the `YCB_Video_toolbox` to the root folder of this repo and test the selected DenseFusion and Iterative Refinement models on the 2949 keyframes of the 10 testing video in YCB_Video Dataset with the same segmentation result of PoseCNN. The result without refinement is stored in `eval_result/ycb/Densefusion_wo_refine_result` and the refined result is in `eval_result/ycb/Densefusion_iterative_result`.
 
-After that, you can add the path of `eval_result/ycb/Densefusion_wo_refine_result/` and `eval_result/ycb/Densefusion_iterative_result/` to the code `YCB_Video_toolbox/evaluate_poses_keyframe.m` and run it with [MATLAB](https://www.mathworks.com/products/matlab.html). The code `YCB_Video_toolbox/plot_accuracy_keyframe.m` can show you the comparsion plot result. You can easily make it by copying the adapted codes from the `replace_ycb_toolbox/` folder and replace them in the `YCB_Video_toolbox/` folder. But you might still need to change the path of your `YCB_Video Dataset/` in the `globals.m` and copy two result folders(`Densefusion_wo_refine_result/` and `Densefusion_iterative_result/`) to the `YCB_Video_toolbox/` folder. 
+After that, you can add the path of `experiments/eval_result/ycb/Densefusion_wo_refine_result/` and `experiments/eval_result/ycb/Densefusion_iterative_result/` to the code `YCB_Video_toolbox/evaluate_poses_keyframe.m` and run it with [MATLAB](https://www.mathworks.com/products/matlab.html). The code `YCB_Video_toolbox/plot_accuracy_keyframe.m` can show you the comparsion plot result. You can easily make it by copying the adapted codes from the `replace_ycb_toolbox/` folder and replace them in the `YCB_Video_toolbox/` folder. But you might still need to change the path of your `YCB_Video Dataset/` in the `globals.m` and copy two result folders(`Densefusion_wo_refine_result/` and `Densefusion_iterative_result/`) to the `YCB_Video_toolbox/` folder. 
 
 
 ### Evaluation on LineMOD Dataset
 Just run:
 ```
-python eval_linemod.py --dataset_root=PATH_TO_YCB_DATASET/ --model=NAME_OF_MODEL --refine_model=NAME_OF_REFINE_MODEL
+./experiments/scripts/eval_linemod.sh
 ```
-This script will test the models on the testing set of the LineMOD dataset with the masks outputted by the trained vanilla SegNet model. The result will be printed at the end of the execution and saved as a log in `eval_result/linemod/`.
+This script will test the models on the testing set of the LineMOD dataset with the masks outputted by the trained vanilla SegNet model. The result will be printed at the end of the execution and saved as a log in `experiments/eval_result/linemod/`.
 
 
 ## Results

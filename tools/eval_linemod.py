@@ -1,3 +1,4 @@
+import _init_paths
 import argparse
 import os
 import random
@@ -19,9 +20,9 @@ from lib.loss import Loss
 from lib.loss_refiner import Loss_refine
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset_root', type=str, default = '/home/data1/jeremy/Linemod_preprocessed', help='dataset root dir')
-parser.add_argument('--model', type=str, default = 'pose_model_9_0.01310166542980859.pth',  help='resume PoseNet model')
-parser.add_argument('--refine_model', type=str, default = 'pose_refine_model_493_0.006761023565178073.pth',  help='resume PoseRefineNet model')
+parser.add_argument('--dataset_root', type=str, default = '', help='dataset root dir')
+parser.add_argument('--model', type=str, default = '',  help='resume PoseNet model')
+parser.add_argument('--refine_model', type=str, default = '',  help='resume PoseRefineNet model')
 opt = parser.parse_args()
 
 num_objects = 13
@@ -30,7 +31,7 @@ num_points = 500
 iteration = 2
 dataset_config_dir = 'datasets/linemod/dataset_config'
 trained_models_dir = 'trained_models/linemod'
-output_result_dir = 'eval_result/linemod'
+output_result_dir = 'experiments/eval_result/linemod'
 
 
 estimator = PoseNet(num_points = num_points, num_obj = num_objects)
