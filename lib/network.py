@@ -17,8 +17,6 @@ import torch.nn.functional as F
 from lib.pspnet import PSPNet
 
 psp_models = {
-    'squeezenet': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=512, deep_features_size=256, backend='squeezenet'),
-    'densenet': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=1024, deep_features_size=512, backend='densenet'),
     'resnet18': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=512, deep_features_size=256, backend='resnet18'),
     'resnet34': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=512, deep_features_size=256, backend='resnet34'),
     'resnet50': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=2048, deep_features_size=1024, backend='resnet50'),
@@ -126,10 +124,7 @@ class PoseNet(nn.Module):
         out_rx = torch.index_select(rx[b], 0, obj[b])
         out_tx = torch.index_select(tx[b], 0, obj[b])
         out_cx = torch.index_select(cx[b], 0, obj[b])
-        # for b in range(1, bs):
-        #     out_rx = torch.cat((out_rx, torch.index_select(rx[b], 0, obj[b])), dim=0)
-        #     out_tx = torch.cat((out_tx, torch.index_select(tx[b], 0, obj[b])), dim=0)
-        #     out_cx = torch.cat((out_cx, torch.index_select(cx[b], 0, obj[b])), dim=0)
+        
         out_rx = out_rx.contiguous().transpose(2, 1).contiguous()
         out_cx = out_cx.contiguous().transpose(2, 1).contiguous()
         out_tx = out_tx.contiguous().transpose(2, 1).contiguous()
@@ -207,9 +202,5 @@ class PoseRefineNet(nn.Module):
         b = 0
         out_rx = torch.index_select(rx[b], 0, obj[b])
         out_tx = torch.index_select(tx[b], 0, obj[b])
-
-        # for b in range(1, bs):
-        #     out_rx = torch.cat((out_rx, torch.index_select(rx[b], 0, obj[b])), dim=0)
-        #     out_tx = torch.cat((out_tx, torch.index_select(tx[b], 0, obj[b])), dim=0)
 
         return out_rx, out_tx
