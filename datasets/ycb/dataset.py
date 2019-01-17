@@ -197,8 +197,8 @@ class PoseDataset(data.Dataset):
             cloud = np.add(cloud, add_t)
 
         # fw = open('temp/{0}_cld.xyz'.format(index), 'w')
-        # for target in cloud:
-        #    fw.write('{0} {1} {2}\n'.format(target[0], target[1], target[2]))
+        # for it in cloud:
+        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
         # fw.close()
 
         dellist = [j for j in range(0, len(self.cld[obj[idx]]))]
@@ -209,8 +209,8 @@ class PoseDataset(data.Dataset):
         model_points = np.delete(self.cld[obj[idx]], dellist, axis=0)
 
         # fw = open('temp/{0}_model_points.xyz'.format(index), 'w')
-        # for target in model_points:
-        #    fw.write('{0} {1} {2}\n'.format(target[0], target[1], target[2]))
+        # for it in model_points:
+        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
         # fw.close()
 
         target = np.dot(model_points, target_r.T)
@@ -220,8 +220,8 @@ class PoseDataset(data.Dataset):
             target = np.add(target, target_t)
         
         # fw = open('temp/{0}_tar.xyz'.format(index), 'w')
-        # for tt in target:
-        #    fw.write('{0} {1} {2}\n'.format(tt[0], tt[1], tt[2]))
+        # for it in target:
+        #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
         # fw.close()
         
         return torch.from_numpy(cloud.astype(np.float32)), \

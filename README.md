@@ -16,6 +16,7 @@
 - [Results](#results)
 - [Trained Checkpoints](#trained-checkpoints)
 - [Tips for your own dataset](#tips-for-your-own-dataset)
+- [Citations](#citations)
 - [License](#license)
 
 ## Overview
@@ -178,6 +179,18 @@ You can download the trained DenseFusion and Iterative Refinement models of both
 
 ## Tips for your own dataset
 As you can see in this repo, the network code and the hyperparameters(lr and w) remain the same for both datasets. Which means you might not need to adjust too much on the network structure and hyperparameters when you use this repo on your own dataset. Please make sure that the distance metric in your dataset should be converted to meter, otherwise the hyperparameter w need to be adjusted. Several useful tools including [LabelFusion](https://github.com/RobotLocomotion/LabelFusion) and [sixd_toolkit](https://github.com/thodan/sixd_toolkit) has been tested to work well. (Please make sure to turn on the depth image collection in LabelFusion when you use it.)
+
+
+## Citations
+Please cite [DenseFusion](https://sites.google.com/view/densefusion) if you use this repository in your publications:
+```
+@article{wang2019densefusion,
+  title={DenseFusion: 6D Object Pose Estimation by Iterative Dense Fusion},
+  author={Wang, Chen and Xu, Danfei and Zhu, Yuke and Mart{\'\i}n-Mart{\'\i}n, Roberto and Lu, Cewu and Fei-Fei, Li and Savarese, Silvio},
+  journal={arXiv preprint arXiv:1901.04780},
+  year={2019}
+}
+```
 
 ## License
 Licensed under the [MIT License](LICENSE)
