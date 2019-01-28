@@ -26,7 +26,7 @@ This repository is the implementation code of the paper "DenseFusion: 6D Object 
 
 ## Requirements
 
-* Python 2.7/3.5/3.6 (If you want use Python2.7 to run this repo, please rebuild the `lib/knn/` (with PyTorch 0.4.1).)
+* Python 2.7/3.5/3.6 (If you want to use Python2.7 to run this repo, please rebuild the `lib/knn/` (with PyTorch 0.4.1).)
 * [PyTorch 0.4.1](https://pytorch.org/)
 * PIL
 * scipy
@@ -89,7 +89,7 @@ This work is tested on two 6D object pose estimation datasets:
 
 * [LineMOD](http://campar.in.tum.de/Main/StefanHinterstoisser): Download the [preprocessed LineMOD dataset](https://drive.google.com/drive/folders/19ivHpaKm9dOrr12fzC8IDFczWRPFxho7) (including the testing results outputted by the trained vanilla SegNet used for evaluation).
 
-Download YCB_Video Dataset, preprocessed LineMOD dataset and the trained checkpoints:
+Download YCB_Video Dataset, preprocessed LineMOD dataset and the trained checkpoints (You can modify this script according to your needs.):
 ```	
 ./download.sh
 ```
@@ -175,7 +175,7 @@ The qualitative result on the YCB_Video dataset.
 </p>
 
 ## Trained Checkpoints
-You can download the trained DenseFusion and Iterative Refinement models of both datasets from [Link](https://drive.google.com/drive/folders/19ivHpaKm9dOrr12fzC8IDFczWRPFxho7).
+You can download the trained DenseFusion and Iterative Refinement checkpoints of both datasets from [Link](https://drive.google.com/drive/folders/19ivHpaKm9dOrr12fzC8IDFczWRPFxho7).
 
 ## Tips for your own dataset
 As you can see in this repo, the network code and the hyperparameters(lr and w) remain the same for both datasets. Which means you might not need to adjust too much on the network structure and hyperparameters when you use this repo on your own dataset. Please make sure that the distance metric in your dataset should be converted to meter, otherwise the hyperparameter w need to be adjusted. Several useful tools including [LabelFusion](https://github.com/RobotLocomotion/LabelFusion) and [sixd_toolkit](https://github.com/thodan/sixd_toolkit) has been tested to work well. (Please make sure to turn on the depth image collection in LabelFusion when you use it.)
