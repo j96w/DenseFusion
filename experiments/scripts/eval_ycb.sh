@@ -15,6 +15,6 @@ if [ ! -d YCB_Video_toolbox ];then
     cp replace_ycb_toolbox/*.m YCB_Video_toolbox/
 fi
 
-python ./tools/eval_ycb.py --dataset_root ./datasets/ycb/YCB_Video_Dataset\
-  --model pose_model_26_0.012863246640872631.pth\
-  --refine_model pose_refine_model_69_0.009449292959118935.pth
+python3 ./tools/eval_ycb.py --dataset_root ./datasets/ycb/YCB_Video_Dataset\
+  --model trained_checkpoints/ycb/pose_model_26_0.012863246640872631.pth\
+  --refine_model trained_checkpoints/ycb/pose_refine_model_69_0.009449292959118935.pth

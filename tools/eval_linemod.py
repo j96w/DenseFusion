@@ -30,7 +30,6 @@ objlist = [1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15]
 num_points = 500
 iteration = 2
 dataset_config_dir = 'datasets/linemod/dataset_config'
-trained_models_dir = 'trained_models/linemod'
 output_result_dir = 'experiments/eval_result/linemod'
 
 
@@ -38,8 +37,8 @@ estimator = PoseNet(num_points = num_points, num_obj = num_objects)
 estimator.cuda()
 refiner = PoseRefineNet(num_points = num_points, num_obj = num_objects)
 refiner.cuda()
-estimator.load_state_dict(torch.load('{0}/{1}'.format(trained_models_dir, opt.model)))
-refiner.load_state_dict(torch.load('{0}/{1}'.format(trained_models_dir, opt.refine_model)))
+estimator.load_state_dict(torch.load(opt.model))
+refiner.load_state_dict(torch.load(opt.refine_model))
 estimator.eval()
 refiner.eval()
 

@@ -26,7 +26,7 @@ This repository is the implementation code of the paper "DenseFusion: 6D Object 
 
 ## Requirements
 
-* Python 2.7/3.5/3.6 (No strict requirements for the Python version. Small changes of some print functions might be enough to switch between different versions.)
+* Python 2.7/3.5/3.6 (If you want use Python2.7 to run this repo, please rebuild the `lib/knn/` (with PyTorch 0.4.1).)
 * [PyTorch 0.4.1](https://pytorch.org/)
 * PIL
 * scipy

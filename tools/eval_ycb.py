@@ -50,7 +50,6 @@ dataset_config_dir = 'datasets/ycb/dataset_config'
 ycb_toolbox_dir = 'YCB_Video_toolbox'
 result_wo_refine_dir = 'experiments/eval_result/ycb/Densefusion_wo_refine_result'
 result_refine_dir = 'experiments/eval_result/ycb/Densefusion_iterative_result'
-trained_models_dir = 'trained_models/ycb'
 
 def get_bbox(posecnn_rois):
     rmin = int(posecnn_rois[idx][3]) + 1
@@ -92,12 +91,12 @@ def get_bbox(posecnn_rois):
 
 estimator = PoseNet(num_points = num_points, num_obj = num_obj)
 estimator.cuda()
-estimator.load_state_dict(torch.load('{0}/{1}'.format(trained_models_dir, opt.model)))
+estimator.load_state_dict(torch.load(opt.model))
 estimator.eval()
 
 refiner = PoseRefineNet(num_points = num_points, num_obj = num_obj)
 refiner.cuda()
-refiner.load_state_dict(torch.load('{0}/{1}'.format(trained_models_dir, opt.refine_model)))
+refiner.load_state_dict(torch.load(opt.refine_model))
 refiner.eval()
 
 testlist = []
