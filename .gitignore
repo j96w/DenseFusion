@@ -1,0 +1,7 @@
+*.pyc
+__pycache__
+Linemod_preprocessed
+YCB_Video_Dataset
+YCB_Video_toolbox
+trained_checkpoints
+

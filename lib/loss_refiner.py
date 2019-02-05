@@ -6,7 +6,7 @@ import numpy as np
 import torch.nn as nn
 import random
 import torch.backends.cudnn as cudnn
-from lib.knn.__init__ import KNearestNeighbor
+from .knn import KNearestNeighbor
 
 knn = KNearestNeighbor(1)
 
