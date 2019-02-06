@@ -3,26 +3,24 @@ import os
 import torch
 from torch.autograd import Variable
 
-from .datasets.linemod.dataset import PoseDataset as PoseDataset_linemod
 from .lib.network import PoseNet, PoseRefineNet
 from .lib.loss import Loss
 from .lib.loss_refiner import Loss_refine
 
 
-_PREFIX = os.path.dirname(os.path.abspath(__file__))
+_PREFIX = os.path.dirname(os.path.realpath(__file__))
 
 class DenseFusionEstimator:
+    """
+    Warning: currently specialized for Linemod only.
+    """
 
-    def __init__(
-        self,
-        dataset=_PREFIX + "/datasets/linemod/Linemod_preprocessed",
-        model=_PREFIX + "/trained_checkpoints/linemod/pose_model_9_0.01310166542980859.pth",
-        refine_model=_PREFIX + "/trained_checkpoints/linemod/pose_refine_model_493_0.006761023565178073.pth"
-    ):
+    def __init__(self, model_prefix=_PREFIX + "/trained_checkpoints/linemod"):
 
-
-        self.num_objects = 13
+        # Linemod Dataset info
         self.objlist = [1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.sym_list = [7, 8]
+        self.num_objects = len(self.objlist)
         self.num_points = 500
         self.iteration = 2
 
@@ -31,20 +29,21 @@ class DenseFusionEstimator:
         self.estimator.cuda()
         self.refiner = PoseRefineNet(num_points = self.num_points, num_obj = self.num_objects)
         self.refiner.cuda()
+
+        # Load models
+        model = os.path.join(model_prefix, "pose_model_9_0.01310166542980859.pth")
+        refine_model = os.path.join(model_prefix, "pose_refine_model_493_0.006761023565178073.pth")
         self.estimator.load_state_dict(torch.load(model))
         self.refiner.load_state_dict(torch.load(refine_model))
         self.estimator.eval()
         self.refiner.eval()
 
         # Initialize criterion
-        self.testdataset = PoseDataset_linemod('eval', self.num_points, False, dataset, 0.0, True)
-        self.sym_list = self.testdataset.get_sym_list()
-        self.num_points_mesh = self.testdataset.get_num_points_mesh()
-        self.criterion = Loss(self.num_points_mesh, self.sym_list)
-        self.criterion_refine = Loss_refine(self.num_points_mesh, self.sym_list)
+        self.criterion = Loss(self.num_points, self.sym_list)
+        self.criterion_refine = Loss_refine(self.num_points, self.sym_list)
 
     # def estimate(self, points, choose, img, target, model_points, idx):
-    def estimate(self, points, choose, img, model_points, idx):
+    def pose(self, points, choose, img, model_points, idx):
 
         points_ = Variable(points).cuda()
         choose_ = Variable(choose).cuda()
