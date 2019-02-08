@@ -61,8 +61,12 @@ success_count = [0 for i in range(num_objects)]
 num_count = [0 for i in range(num_objects)]
 fw = open('{0}/eval_result_logs.txt'.format(output_result_dir), 'w')
 
+np.random.seed(0)
+np.random.seed(42)
+# testdataset.__getitem__(0)
 for i, data in enumerate(testdataloader, 0):
     points, choose, img, target, model_points, idx = data
+    # import ipdb; ipdb.set_trace()
     if len(points.size()) == 2:
         print('No.{0} NOT Pass! Lost detection!'.format(i))
         fw.write('No.{0} NOT Pass! Lost detection!\n'.format(i))
@@ -74,10 +78,12 @@ for i, data in enumerate(testdataloader, 0):
                                                      Variable(model_points).cuda(), \
                                                      Variable(idx).cuda()
     pred_r, pred_t, pred_c, emb = estimator(img, points, choose, idx)
-    _, dis, new_points, new_target = criterion(pred_r, pred_t, pred_c, target, model_points, idx, points, 0.0, False)
+    _, dis, new_points, new_target, max_idx = criterion(pred_r, pred_t, pred_c, target, model_points, idx, points, 0.0, False)
     for ite in range(0, iteration):
         pred_r, pred_t = refiner(new_points, emb, idx)
         dis, new_points, new_target = criterion_refine(pred_r, pred_t, new_target, model_points, idx, new_points)
+
+    # import ipdb; ipdb.set_trace()
 
     if dis.item() < diameter[idx[0].item()]:
         success_count[idx[0].item()] += 1

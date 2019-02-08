@@ -139,19 +139,25 @@ class PoseDataset(data.Dataset):
             choose = choose[c_mask.nonzero()]
         else:
             choose = np.pad(choose, (0, self.num - len(choose)), 'wrap')
-        
+
         depth_masked = depth[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         xmap_masked = self.xmap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         ymap_masked = self.ymap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         choose = np.array([choose])
+
+        # depth_masked = depth[rmin:rmax, cmin:cmax].ravel()
+        # xmap_masked = self.xmap[rmin:rmax, cmin:cmax].ravel()
+        # ymap_masked = self.ymap[rmin:rmax, cmin:cmax].ravel()
 
         cam_scale = 1.0
         pt2 = depth_masked / cam_scale
         pt0 = (ymap_masked - self.cam_cx) * pt2 / self.cam_fx
         pt1 = (xmap_masked - self.cam_cy) * pt2 / self.cam_fy
         cloud = np.concatenate((pt0, pt1, pt2), axis=1)
+        # cloud = np.stack((pt0, pt1, pt2), axis=1)
         cloud = np.add(cloud, -1.0 * target_t) / 1000.0
         cloud = np.add(cloud, target_t / 1000.0)
+        # import ipdb; ipdb.set_trace()
 
         if self.add_noise:
             cloud = np.add(cloud, add_t)
@@ -161,10 +167,12 @@ class PoseDataset(data.Dataset):
         #    fw.write('{0} {1} {2}\n'.format(it[0], it[1], it[2]))
         #fw.close()
 
+        # import ipdb; ipdb.set_trace()
         model_points = self.pt[obj] / 1000.0
         dellist = [j for j in range(0, len(model_points))]
         dellist = random.sample(dellist, len(model_points) - self.num_pt_mesh_small)
         model_points = np.delete(model_points, dellist, axis=0)
+        # import ipdb; ipdb.set_trace()
 
         #fw = open('evaluation_result/{0}_model_points.xyz'.format(index), 'w')
         #for it in model_points:
