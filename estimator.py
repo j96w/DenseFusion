@@ -98,11 +98,15 @@ class DenseFusionEstimator:
         pred_r = pred_r[0, max_idx]
         pred_t = pred_t[0, max_idx]
 
+        pred_r /= torch.norm(pred_r)
+
         for _ in range(self.iteration):
         # for _ in range(10):
             pred_r_inc, pred_t_inc = self.refiner(new_points, emb, idx_)
             pred_r_inc = pred_r_inc.view(-1)
             pred_t_inc = pred_t_inc.view(-1)
+
+            pred_r_inc /= torch.norm(pred_r_inc)
 
             # TODO Needs to be validated
             # import pdb; pdb.set_trace()
