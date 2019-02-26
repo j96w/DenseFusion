@@ -206,9 +206,7 @@ for now in range(0, 2949):
                 T = Variable(torch.from_numpy(my_t.astype(np.float32))).cuda().view(1, 3).repeat(num_points, 1).contiguous().view(1, num_points, 3)
                 my_mat = quaternion_matrix(my_r)
                 R = Variable(torch.from_numpy(my_mat[:3, :3].astype(np.float32))).cuda().view(1, 3, 3)
-                my_mat[0][3] = my_t[0]
-                my_mat[1][3] = my_t[1]
-                my_mat[2][3] = my_t[2]
+                my_mat[0:3, 3] = my_t
                 
                 new_cloud = torch.bmm((cloud - T), R).contiguous()
                 pred_r, pred_t = refiner(new_cloud, emb, index)
@@ -218,21 +216,19 @@ for now in range(0, 2949):
                 my_t_2 = pred_t.view(-1).cpu().data.numpy()
                 my_mat_2 = quaternion_matrix(my_r_2)
 
-                my_mat_2[0][3] = my_t_2[0]
-                my_mat_2[1][3] = my_t_2[1]
-                my_mat_2[2][3] = my_t_2[2]
+                my_mat_2[0:3, 3] = my_t_2
 
                 my_mat_final = np.dot(my_mat, my_mat_2)
                 my_r_final = copy.deepcopy(my_mat_final)
-                my_r_final[0][3] = 0
-                my_r_final[1][3] = 0
-                my_r_final[2][3] = 0
+                my_r_final[0:3, 3] = 0
                 my_r_final = quaternion_from_matrix(my_r_final, True)
                 my_t_final = np.array([my_mat_final[0][3], my_mat_final[1][3], my_mat_final[2][3]])
 
                 my_pred = np.append(my_r_final, my_t_final)
                 my_r = my_r_final
                 my_t = my_t_final
+
+            # Here 'my_pred' is the final pose estimation result after refinement ('my_r': quaternion, 'my_t': translation)
 
             my_result.append(my_pred.tolist())
         except ZeroDivisionError:
