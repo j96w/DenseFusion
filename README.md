@@ -187,7 +187,7 @@ Please cite [DenseFusion](https://sites.google.com/view/densefusion) if you use 
 @article{wang2019densefusion,
   title={DenseFusion: 6D Object Pose Estimation by Iterative Dense Fusion},
   author={Wang, Chen and Xu, Danfei and Zhu, Yuke and Mart{\'\i}n-Mart{\'\i}n, Roberto and Lu, Cewu and Fei-Fei, Li and Savarese, Silvio},
-  journal={arXiv preprint arXiv:1901.04780},
+  booktitle={Computer Vision and Pattern Recognition (CVPR)},
   year={2019}
 }
 ```
