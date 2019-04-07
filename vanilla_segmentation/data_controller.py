@@ -15,11 +15,10 @@ from PIL import ImageEnhance
 from PIL import ImageFilter
 
 class SegDataset(data.Dataset):
-    def __init__(self, root_dir, txtlist, use_noise, num=1000):
+    def __init__(self, root_dir, txtlist, use_noise, length):
         self.path = []
         self.real_path = []
         self.use_noise = use_noise
-        self.num = num
         self.root = root_dir
         input_file = open(txtlist)
         while 1:
@@ -33,13 +32,17 @@ class SegDataset(data.Dataset):
                 self.real_path.append(copy.deepcopy(input_line))
         input_file.close()
 
+        self.length = length
+        self.data_len = len(self.path)
         self.back_len = len(self.real_path)
-        self.length = len(self.path)
+
         self.trancolor = transforms.ColorJitter(0.2, 0.2, 0.2, 0.05)
         self.norm = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.back_front = np.array([[1 for i in range(640)] for j in range(480)])
 
-    def __getitem__(self, index):
+    def __getitem__(self, idx):
+        index = random.randint(0, self.data_len - 10)
+
         label = np.array(Image.open('{0}/{1}-label.png'.format(self.root, self.path[index])))
         meta = scio.loadmat('{0}/{1}-meta.mat'.format(self.root, self.path[index]))
         if not self.use_noise:
@@ -51,7 +54,7 @@ class SegDataset(data.Dataset):
             rgb = Image.open('{0}/{1}-color.png'.format(self.root, self.path[index])).convert("RGB")
             rgb = ImageEnhance.Brightness(rgb).enhance(1.5).filter(ImageFilter.GaussianBlur(radius=0.8))
             rgb = np.array(self.trancolor(rgb))
-            seed = random.randint(10, self.back_len - 10)
+            seed = random.randint(0, self.back_len - 10)
             back = np.array(self.trancolor(Image.open('{0}/{1}-color.png'.format(self.root, self.path[seed])).convert("RGB")))
             back_label = np.array(Image.open('{0}/{1}-label.png'.format(self.root, self.path[seed])))
             mask = ma.getmaskarray(ma.masked_equal(label, 0))
