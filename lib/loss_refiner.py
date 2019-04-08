@@ -8,9 +8,9 @@ import random
 import torch.backends.cudnn as cudnn
 from lib.knn.__init__ import KNearestNeighbor
 
-knn = KNearestNeighbor(1)
 
 def loss_calculation(pred_r, pred_t, target, model_points, idx, points, num_point_mesh, sym_list):
+    knn = KNearestNeighbor(1)
     pred_r = pred_r.view(1, 1, -1)
     pred_t = pred_t.view(1, 1, -1)
     bs, num_p, _ = pred_r.size()
@@ -60,7 +60,7 @@ def loss_calculation(pred_r, pred_t, target, model_points, idx, points, num_poin
     new_target = torch.bmm((new_target - ori_t), ori_base).contiguous()
 
     # print('------------> ', dis.item(), idx[0].item())
-
+    del knn
     return dis, new_points.detach(), new_target.detach()
 
 
