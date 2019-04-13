@@ -139,8 +139,8 @@ for i, data in enumerate(testdataloader, 0):
     num_count[idx[0].item()] += 1
 
 for i in range(num_objects):
-    print('Object {0} success rate: {1}'.format(objlist[i], success_count[i] / num_count[i]))
-    fw.write('Object {0} success rate: {1}\n'.format(objlist[i], success_count[i] / num_count[i]))
-print('ALL success rate: {0}'.format(sum(success_count) / sum(num_count)))
-fw.write('ALL success rate: {0}\n'.format(sum(success_count) / sum(num_count)))
+    print('Object {0} success rate: {1}'.format(objlist[i], float(success_count[i]) / num_count[i]))
+    fw.write('Object {0} success rate: {1}\n'.format(objlist[i], float(success_count[i]) / num_count[i]))
+print('ALL success rate: {0}'.format(float(sum(success_count)) / sum(num_count)))
+fw.write('ALL success rate: {0}\n'.format(float(sum(success_count)) / sum(num_count)))
 fw.close()
