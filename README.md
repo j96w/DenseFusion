@@ -117,7 +117,7 @@ Download YCB_Video Dataset, preprocessed LineMOD dataset and the trained checkpo
 	Just run:
 ```
 cd vanilla_segmentation/
-python train.py --dataset_root=./datasets/ycb/YCB_Video_Dataset
+python3 train.py --dataset_root=../datasets/ycb/YCB_Video_Dataset
 ```
 To make the best use of the training set, several data augementation techniques are used in this code:
 
