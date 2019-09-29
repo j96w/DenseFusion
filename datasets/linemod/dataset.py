@@ -154,8 +154,7 @@ class PoseDataset(data.Dataset):
         pt0 = (ymap_masked - self.cam_cx) * pt2 / self.cam_fx
         pt1 = (xmap_masked - self.cam_cy) * pt2 / self.cam_fy
         cloud = np.concatenate((pt0, pt1, pt2), axis=1)
-        cloud = np.add(cloud, -1.0 * target_t) / 1000.0
-        cloud = np.add(cloud, target_t / 1000.0)
+        cloud = cloud / 1000.0
 
         if self.add_noise:
             cloud = np.add(cloud, add_t)
