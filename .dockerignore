@@ -1,0 +1,4 @@
+*.zip
+.git
+datasets/linemod/Linemod_preprocessed
+datasets/ycb/YCB_Video_Dataset
