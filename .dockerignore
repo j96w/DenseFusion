@@ -2,3 +2,5 @@
 .git
 datasets/linemod/Linemod_preprocessed
 datasets/ycb/YCB_Video_Dataset
+*.pth
+YCB_Video_toolbox/*

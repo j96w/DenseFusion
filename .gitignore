@@ -6,3 +6,5 @@ experiments/logs/*
 *.pyc
 lib/knn/knn_pytorch/__pycache__/*
 __init__.*
+*.pth
+YCB_Video_toolbox
