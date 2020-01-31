@@ -1,3 +1,8 @@
 datasets/linemod/Linemod_preprocessed
 datasets/ycb/YCB_Video_Dataset
 *.zip
+*__pycache__
+experiments/logs/*
+*.pyc
+lib/knn/knn_pytorch/__pycache__/*
+__init__.*
