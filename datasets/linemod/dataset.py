@@ -215,7 +215,9 @@ img_length = 640
 
 def mask_to_bbox(mask):
     mask = mask.astype(np.uint8)
-    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+
     x = 0
     y = 0
     w = 0
