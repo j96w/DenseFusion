@@ -58,14 +58,14 @@ class PoseDataset(data.Dataset):
                     self.list_label.append('{0}/segnet_results/{1}_label/{2}_label.png'.format(self.root, '%02d' % item, input_line))
                 else:
                     self.list_label.append('{0}/data/{1}/mask/{2}.png'.format(self.root, '%02d' % item, input_line))
-                
+
                 self.list_obj.append(item)
                 self.list_rank.append(int(input_line))
 
             meta_file = open('{0}/data/{1}/gt.yml'.format(self.root, '%02d' % item), 'r')
             self.meta[item] = yaml.load(meta_file)
             self.pt[item] = ply_vtx('{0}/models/obj_{1}.ply'.format(self.root, '%02d' % item))
-            
+
             print("Object {0} buffer loaded".format(item))
 
         self.length = len(self.list_rgb)
@@ -77,7 +77,7 @@ class PoseDataset(data.Dataset):
 
         self.xmap = np.array([[j for i in range(640)] for j in range(480)])
         self.ymap = np.array([[i for i in range(640)] for j in range(480)])
-        
+
         self.num = num
         self.add_noise = add_noise
         self.trancolor = transforms.ColorJitter(0.2, 0.2, 0.2, 0.05)
@@ -93,7 +93,7 @@ class PoseDataset(data.Dataset):
         depth = np.array(Image.open(self.list_depth[index]))
         label = np.array(Image.open(self.list_label[index]))
         obj = self.list_obj[index]
-        rank = self.list_rank[index]        
+        rank = self.list_rank[index]
 
         if obj == 2:
             for i in range(0, len(self.meta[obj][rank])):
@@ -108,7 +108,7 @@ class PoseDataset(data.Dataset):
             mask_label = ma.getmaskarray(ma.masked_equal(label, np.array(255)))
         else:
             mask_label = ma.getmaskarray(ma.masked_equal(label, np.array([255, 255, 255])))[:, :, 0]
-        
+
         mask = mask_label * mask_depth
 
         if self.add_noise:
@@ -143,7 +143,7 @@ class PoseDataset(data.Dataset):
             choose = choose[c_mask.nonzero()]
         else:
             choose = np.pad(choose, (0, self.num - len(choose)), 'wrap')
-        
+
         depth_masked = depth[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         xmap_masked = self.xmap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
         ymap_masked = self.ymap[rmin:rmax, cmin:cmax].flatten()[choose][:, np.newaxis].astype(np.float32)
@@ -215,7 +215,7 @@ img_length = 640
 
 def mask_to_bbox(mask):
     mask = mask.astype(np.uint8)
-    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     x = 0
     y = 0
     w = 0
@@ -239,7 +239,7 @@ def get_bbox(bbox):
     if bbx[2] < 0:
         bbx[2] = 0
     if bbx[3] >= 640:
-        bbx[3] = 639                
+        bbx[3] = 639
     rmin, rmax, cmin, cmax = bbx[0], bbx[1], bbx[2], bbx[3]
     r_b = rmax - rmin
     for tt in range(len(border_list)):
