@@ -35,7 +35,7 @@ int knn(at::Tensor& ref, at::Tensor& query, at::Tensor& idx)
     for (int b = 0; b < batch; b++)
     {
     knn_device(ref_dev + b * dim * ref_nb, ref_nb, query_dev + b * dim * query_nb, query_nb, dim, k,
-      dist_dev, idx_dev + b * k * query_nb, THCState_getCurrentStream(state));
+      dist_dev, idx_dev + b * k * query_nb, at::cuda::getCurrentCUDAStream());
     }
     THCudaFree(state, dist_dev);
     cudaError_t err = cudaGetLastError();
