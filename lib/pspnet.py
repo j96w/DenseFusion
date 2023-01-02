@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
-import lib.extractors as extractors
+import ObjectReconstructor.DenseFusion.lib.extractors as extractors
 
 
 class PSPModule(nn.Module):
@@ -38,7 +38,7 @@ class PSPUpsample(nn.Module):
 
 
 class PSPNet(nn.Module):
-    def __init__(self, n_classes=21, sizes=(1, 2, 3, 6), psp_size=2048, deep_features_size=1024, backend='resnet18',
+    def __init__(self, n_classes=1, sizes=(1, 2, 3, 6), psp_size=2048, deep_features_size=1024, backend='resnet18',
                  pretrained=False):
         super(PSPNet, self).__init__()
         self.feats = getattr(extractors, backend)(pretrained)

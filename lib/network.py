@@ -14,7 +14,9 @@ from PIL import Image
 import numpy as np
 import pdb
 import torch.nn.functional as F
-from lib.pspnet import PSPNet
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+print(os.path.dirname(SCRIPT_DIR))
+from ObjectReconstructor.DenseFusion.lib.pspnet import PSPNet
 
 psp_models = {
     'resnet18': lambda: PSPNet(sizes=(1, 2, 3, 6), psp_size=512, deep_features_size=256, backend='resnet18'),
@@ -37,7 +39,7 @@ class ModifiedResnet(nn.Module):
         return x
 
 class PoseNetFeat(nn.Module):
-    def __init__(self, num_points):
+    def __init__(self, num_points, emb_dim = 1024):
         super(PoseNetFeat, self).__init__()
         self.conv1 = torch.nn.Conv1d(3, 64, 1)
         self.conv2 = torch.nn.Conv1d(64, 128, 1)
@@ -46,7 +48,7 @@ class PoseNetFeat(nn.Module):
         self.e_conv2 = torch.nn.Conv1d(64, 128, 1)
 
         self.conv5 = torch.nn.Conv1d(256, 512, 1)
-        self.conv6 = torch.nn.Conv1d(512, 1024, 1)
+        self.conv6 = torch.nn.Conv1d(512, emb_dim, 1)
 
         self.ap1 = torch.nn.AvgPool1d(num_points)
         self.num_points = num_points
@@ -64,15 +66,17 @@ class PoseNetFeat(nn.Module):
 
         ap_x = self.ap1(x)
 
-        ap_x = ap_x.view(-1, 1024, 1).repeat(1, 1, self.num_points)
-        return torch.cat([pointfeat_1, pointfeat_2, ap_x], 1) #128 + 256 + 1024
+        #ap_x = ap_x.view(-1, 1024, 1).repeat(1, 1, self.num_points)
+        #return torch.cat([pointfeat_1, pointfeat_2, ap_x], 1) #128 + 256 + 1024
+        return x, ap_x
 
 class PoseNet(nn.Module):
-    def __init__(self, num_points, num_obj):
+    def __init__(self, num_points, emb_dim = 1024, num_obj = 1):
         super(PoseNet, self).__init__()
         self.num_points = num_points
+        self.emb_dim = emb_dim
         self.cnn = ModifiedResnet()
-        self.feat = PoseNetFeat(num_points)
+        self.feat = PoseNetFeat(num_points, emb_dim = emb_dim)
         
         self.conv1_r = torch.nn.Conv1d(1408, 640, 1)
         self.conv1_t = torch.nn.Conv1d(1408, 640, 1)
@@ -93,43 +97,23 @@ class PoseNet(nn.Module):
         self.num_obj = num_obj
 
     def forward(self, img, x, choose, obj):
-        out_img = self.cnn(img)
+        batch_x = torch.empty((x.shape[0], x.shape[1], self.emb_dim, self.num_points)).to(x.device)
+        batch_ap_x = torch.empty((x.shape[0], x.shape[1], self.emb_dim, 1)).to(x.device)
+        for batch_idx, (colors, points, mask) in enumerate(zip(img,x,choose)):
+            out_img = self.cnn(colors)
+            bs, di, _, _ = out_img.size()
+            emb = out_img.view(bs, di, -1)
+            choose = mask.unsqueeze(1).repeat(1, di, 1)
+            emb = torch.gather(emb, 2, choose).contiguous()
+            x = points.transpose(2, 1).contiguous()
+            x, ap_x = self.feat(x, emb)
+            batch_x[batch_idx][:]= x
+            batch_ap_x[batch_idx][:]= ap_x
         
-        bs, di, _, _ = out_img.size()
-
-        emb = out_img.view(bs, di, -1)
-        choose = choose.repeat(1, di, 1)
-        emb = torch.gather(emb, 2, choose).contiguous()
+        avg_x = batch_x.mean(dim=1)
+        avg_ap_x = batch_ap_x.mean(dim=1)
         
-        x = x.transpose(2, 1).contiguous()
-        ap_x = self.feat(x, emb)
-
-        rx = F.relu(self.conv1_r(ap_x))
-        tx = F.relu(self.conv1_t(ap_x))
-        cx = F.relu(self.conv1_c(ap_x))      
-
-        rx = F.relu(self.conv2_r(rx))
-        tx = F.relu(self.conv2_t(tx))
-        cx = F.relu(self.conv2_c(cx))
-
-        rx = F.relu(self.conv3_r(rx))
-        tx = F.relu(self.conv3_t(tx))
-        cx = F.relu(self.conv3_c(cx))
-
-        rx = self.conv4_r(rx).view(bs, self.num_obj, 4, self.num_points)
-        tx = self.conv4_t(tx).view(bs, self.num_obj, 3, self.num_points)
-        cx = torch.sigmoid(self.conv4_c(cx)).view(bs, self.num_obj, 1, self.num_points)
-        
-        b = 0
-        out_rx = torch.index_select(rx[b], 0, obj[b])
-        out_tx = torch.index_select(tx[b], 0, obj[b])
-        out_cx = torch.index_select(cx[b], 0, obj[b])
-        
-        out_rx = out_rx.contiguous().transpose(2, 1).contiguous()
-        out_cx = out_cx.contiguous().transpose(2, 1).contiguous()
-        out_tx = out_tx.contiguous().transpose(2, 1).contiguous()
-        
-        return out_rx, out_tx, out_cx, emb.detach()
+        return avg_x, avg_ap_x
  
 
 
